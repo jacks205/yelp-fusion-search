@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>YELP_API_URL</key>
+	<string>https://api.yelp.com/v3</string>
+	<key>YELP_API_KEY</key>
+	<string>TBE1yNxvVuA7EnmNfzeStf9U97u-Yg0xLXhi3wCrFrPvNxNXrSSIloKf5adPDB5uv05sFuMOSDSOdV9VVqJTDPmYvMb-A927Tl3jjI_em80Nd4ziBgcDAZejpgOWWnYx</string>
+</dict>
+</plist>
