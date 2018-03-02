@@ -12,11 +12,9 @@ class BusinessSearchViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let topRefreshControl: UIRefreshControl = {
-        let rc = UIRefreshControl()
-        rc.tintColor = .black
-        return rc
-    }()
+    let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    
+    var searchTerm: String?
     
     private let viewModel = BusinessSearchViewModel()
     private var businesses: [Business] {
@@ -28,17 +26,15 @@ class BusinessSearchViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         configureCollectionView()
-        topRefreshControl.addTarget(self, action: #selector(BusinessSearchViewController.refreshNearbyBusinessesList), for: UIControlEvents.valueChanged)
-        collectionView.refreshControl = topRefreshControl
+        activityIndicator.center = view.center
+        view.addSubview(activityIndicator)
+        title = searchTerm
+        
+        refreshNearbyBusinessesList()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        viewModel.requestLocation()
-        viewModel.search(withTerm: "sushi") { [weak self] (result, error) in
-            self?.collectionView.reloadData()
-        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -57,18 +53,20 @@ class BusinessSearchViewController: UIViewController {
         collectionView.register(BusinessCollectionViewCell.self, forCellWithReuseIdentifier: BusinessCollectionViewCell.reuseIdentifier)
     }
     
-    @objc func refreshNearbyBusinessesList() {
-        viewModel.search(withTerm: "sushi") { [weak self] (result, error) in
-            self?.topRefreshControl.endRefreshing()
+    func refreshNearbyBusinessesList() {
+        guard let searchTerm = searchTerm else { return }
+        activityIndicator.startAnimating()
+        viewModel.search(withTerm: searchTerm) { [weak self] (result, error) in
+            if result == nil && error == nil {
+                print("Location not given")
+                self?.navigationController?.popViewController(animated: true)
+                return
+            }
             self?.collectionView.reloadData()
+            self?.activityIndicator.stopAnimating()
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        // For pushing UIRefreshControl to the back of subviews
-        collectionView.sendSubview(toBack: topRefreshControl)
-    }
 }
 
 // MARK: - UICollectionViewDelegate
@@ -92,28 +90,26 @@ extension BusinessSearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let collectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: BusinessCollectionViewCell.reuseIdentifier, for: indexPath) as! BusinessCollectionViewCell
         let business = businesses[indexPath.row]
-        
-//        collectionViewCell.backgroundColor = Colors.Purple.dark
         collectionViewCell.business = business
-        
-        // Download and cache image, then set to cv image view.
-        DispatchQueue.global().async {
-            if  let imageURL = business.imageURL {
-                UIImage.downloadImage(fromURL: imageURL, useCache: true, completion: { image in
-                    DispatchQueue.main.sync {
-                        collectionViewCell.businessImage = image
-                    }
-                })
+            // Download and cache image, then set to cv image view.
+            DispatchQueue.global().async {
+                if  let imageURL = business.imageURL {
+                    UIImage.downloadImage(fromURL: imageURL, useCache: true, completion: { image in
+                        DispatchQueue.main.sync {
+                            collectionViewCell.businessImage = image
+                        }
+                    })
+                }
             }
-        }
+//        }
         return collectionViewCell
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        // If the last cell shows, load in more top games.
-//        if indexPath.row == businesses.count - 1 {
-//            refreshNearbyBusinessesList()
-//        }
+        // If the last cell shows, load in more top businesses.
+        if indexPath.row == businesses.count - 1 {
+            refreshNearbyBusinessesList()
+        }
     }
 }
 
@@ -121,13 +117,19 @@ extension BusinessSearchViewController: UICollectionViewDataSource {
 
 extension BusinessSearchViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        // 3 games per row, divide cv width by 3 minus edge insets
-        let width = collectionView.bounds.width / 3.0 - 16
+        let business = businesses[indexPath.row]
+        // 2 businesses per row, divide cv width by 2 minus edge insets
+        let width = collectionView.bounds.width / 2.0 - 16
         // If cell doesn't exist yet, set default size
         guard   let cell = collectionView.cellForItem(at: indexPath) as? BusinessCollectionViewCell,
-            let imageHeight = cell.imageViewHeightConstraint?.constant else {
-                let height = width * 1.7
-                return CGSize(width: width, height: height)
+                let imageHeight = cell.imageViewHeightConstraint?.constant else {
+                if let image = business.image {
+                    let imageHeight = image.size.height
+                    let imageWidth = image.size.width
+                    let newHeight = imageHeight / imageWidth * width
+                    return CGSize(width: width, height: newHeight + 16)
+                }
+                return CGSize(width: width, height: width * 1.5)
         }
         // Set size according to content in cell
         let businessNameLabelHeight = cell.businessNameLabel.frame.height
@@ -149,12 +151,4 @@ extension BusinessSearchViewController: UICollectionViewDelegateFlowLayout {
         return 20
     }
 }
-
-// MARK: - Utilities
-
-extension BusinessSearchViewController {
-    
-
-}
-
 

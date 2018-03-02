@@ -32,7 +32,7 @@ class BusinessCollectionViewCell: UICollectionViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
-        lbl.textColor = .white
+        lbl.textColor = .black
         return lbl
     }()
     
@@ -40,7 +40,7 @@ class BusinessCollectionViewCell: UICollectionViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.font = UIFont.systemFont(ofSize: 10)
-        lbl.textColor = .lightGray
+        lbl.textColor = .darkGray
         return lbl
     }()
     
@@ -99,7 +99,8 @@ class BusinessCollectionViewCell: UICollectionViewCell {
         }
         if let business = business {
             businessNameLabel.text = business.name
-            distanceLabel.text = "\(business.distance) away"
+            let formattedDistance = String(format: "%.0fm", business.distance.value)
+            distanceLabel.text = "\(formattedDistance) away"
         }
     }
     

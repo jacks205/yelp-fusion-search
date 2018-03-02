@@ -8,42 +8,79 @@
 
 import Foundation
 import CoreLocation
+import UIKit
+
+typealias FusionSearchResultsCompletion = (BusinessSearchResult?, Error?) -> ()
 
 class BusinessSearchViewModel {
     
     let client = YelpCacheClient()
     
-    var location: CLLocation?
+    var location: CLLocation? {
+        return locationService.location
+    }
     
     var buisinessSearchResults: BusinessSearchResult?
     
-    var businesses: [Business] {
-        return buisinessSearchResults?.businesses ?? []
-    }
+    var businesses: [Business] = []
     
-    func requestLocation() {
+    var offset: UInt = 0
+    
+    func requestLocation(completion: @escaping (CLLocation?) -> ()) {
         if location != nil {
             return
         }
         locationService.getLocation { (location) in
-            self.location = location
+            completion(location)
         }
     }
     
-    func search(withTerm term: String, completion: @escaping (BusinessSearchResult?, Error?) -> ()) {
+    func search(withTerm term: String, completion: @escaping FusionSearchResultsCompletion) {
         guard let location = self.location else {
-            completion(nil, nil)
-            return
-        }
-        DispatchQueue.global().async { [weak self] in
-            let searchResource = BusinessSearchResult.query(term: term, atLocation: location)!
-            self?.client.get(resource: searchResource, completion: { (searchResult, error) in
-                self?.buisinessSearchResults = searchResult
-                DispatchQueue.main.async {
-                    completion(searchResult, error)
+            self.requestLocation(completion: { (location) in
+                if let location = location {
+                    self.search(withTerm: term, location: location, completion: completion)
+                } else {
+                    DispatchQueue.main.async {
+                        completion(nil, nil)
+                    }
                 }
             })
+            return
         }
+        search(withTerm: term, location: location, completion: completion)
+    }
+    
+    private func search(withTerm term: String, location: CLLocation, completion: @escaping FusionSearchResultsCompletion) {
+        DispatchQueue.global().async { [weak self] in
+            guard let offset = self?.offset else { return }
+            let dispatchGroup = DispatchGroup()
+            dispatchGroup.enter()
+            let searchResource = BusinessSearchResult.query(term: term, limit: offset, offset: offset, atLocation: location)!
+            self?.client.get(resource: searchResource, completion: { (searchResult, error) in
+                dispatchGroup.notify(queue: DispatchQueue.main) {
+                    completion(self?.buisinessSearchResults, error)
+                }
+                
+                if let searchResult = searchResult {
+                    self?.buisinessSearchResults = searchResult
+                    if error == nil {
+                        self?.businesses += searchResult.businesses
+                        self?.offset += 20
+                    }
+                }
+                //                for (i, _) in searchResult.businesses.enumerated() {
+                //                    guard let imageURL = self?.businessSearchResults?.businesses[i].imageURL else { continue }
+                //                    dispatchGroup.enter()
+                //                    UIImage.downloadImage(fromURL: imageURL, useCache: true, completion: { (image) in
+                //                        self?.buisinessSearchResults?.businesses[i].image = image
+                //                        dispatchGroup.leave()
+                //                    })
+                //                }
+                dispatchGroup.leave()
+            })
+        }
+
     }
     
 }

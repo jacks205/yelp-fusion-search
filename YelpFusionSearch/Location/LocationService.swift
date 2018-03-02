@@ -29,6 +29,7 @@ class LocationService: NSObject, CLLocationManagerDelegate {
         getLocationCompletion = completion
         if location == nil {
             manager.requestWhenInUseAuthorization()
+            manager.requestLocation()
         }
     }
     

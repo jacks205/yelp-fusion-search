@@ -24,6 +24,8 @@
 		EA057C4C20467AE400FC0BBD /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA057C4B20467AE400FC0BBD /* LocationService.swift */; };
 		EA057C4F2046967400FC0BBD /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA057C4E2046967400FC0BBD /* UIImage.swift */; };
 		EA057C51204697D500FC0BBD /* BusinessCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA057C50204697D500FC0BBD /* BusinessCollectionViewCell.swift */; };
+		EA77752B2047BFAA00C630A2 /* TermSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA77752A2047BFAA00C630A2 /* TermSearchViewController.swift */; };
+		EA77752D2047C49200C630A2 /* TermSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA77752C2047C49200C630A2 /* TermSearchViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +48,8 @@
 		EA057C4B20467AE400FC0BBD /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		EA057C4E2046967400FC0BBD /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		EA057C50204697D500FC0BBD /* BusinessCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessCollectionViewCell.swift; sourceTree = "<group>"; };
+		EA77752A2047BFAA00C630A2 /* TermSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermSearchViewController.swift; sourceTree = "<group>"; };
+		EA77752C2047C49200C630A2 /* TermSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermSearchViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +112,7 @@
 		EA057C33204639EC00FC0BBD /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EA77752A2047BFAA00C630A2 /* TermSearchViewController.swift */,
 				EA057C22204638FC00FC0BBD /* BusinessSearchViewController.swift */,
 			);
 			path = Controllers;
@@ -125,6 +130,7 @@
 		EA057C35204639FC00FC0BBD /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				EA77752C2047C49200C630A2 /* TermSearchViewModel.swift */,
 				EA057C4320464A2000FC0BBD /* BusinessSearchViewModel.swift */,
 			);
 			path = ViewModels;
@@ -241,6 +247,8 @@
 				EA057C3A20463D4800FC0BBD /* Resource.swift in Sources */,
 				EA057C402046442300FC0BBD /* BusinessSearchResult.swift in Sources */,
 				EA057C4C20467AE400FC0BBD /* LocationService.swift in Sources */,
+				EA77752B2047BFAA00C630A2 /* TermSearchViewController.swift in Sources */,
+				EA77752D2047C49200C630A2 /* TermSearchViewModel.swift in Sources */,
 				EA057C23204638FC00FC0BBD /* BusinessSearchViewController.swift in Sources */,
 				EA057C422046465F00FC0BBD /* Constants.swift in Sources */,
 				EA057C3E2046418700FC0BBD /* Business.swift in Sources */,

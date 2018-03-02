@@ -15,7 +15,7 @@ protocol Cachable: Codable {
 
 struct BusinessSearchResult: Cachable {
     let total: UInt
-    let businesses: [Business]
+    var businesses: [Business]
     
     static var cacheHash: String {
         return "business_search_results"
@@ -35,11 +35,13 @@ extension BusinessSearchResult: Encodable {
 }
 
 extension BusinessSearchResult {
-    static func query(term: String, atLocation location: CLLocation) -> Resource<BusinessSearchResult>? {
+    static func query(term: String, limit: UInt = 10, offset: UInt = 0, atLocation location: CLLocation) -> Resource<BusinessSearchResult>? {
         let termItem = URLQueryItem(name: "term", value: term)
+        let amountItem = URLQueryItem(name: "limit", value: "\(limit)")
+        let offsetItem = URLQueryItem(name: "offset", value: "\(offset)")
         let latitudeItem = URLQueryItem(name: "latitude", value: "\(location.coordinate.latitude)")
         let lontitudeItem = URLQueryItem(name: "longitude", value: "\(location.coordinate.longitude)")
-        guard let url = Y_CONSTANTS.url(withPath: "/businesses/search", queryItems: [termItem, latitudeItem, lontitudeItem]) else { return nil }
+        guard let url = Y_CONSTANTS.url(withPath: "/businesses/search", queryItems: [termItem, amountItem, offsetItem, latitudeItem, lontitudeItem]) else { return nil }
         return Resource<BusinessSearchResult>(url: url)
     }
 }
