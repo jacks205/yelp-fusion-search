@@ -25,6 +25,7 @@ class BusinessSearchViewModel {
     var businesses: [Business] = []
     
     var offset: UInt = 0
+    let limit: UInt = 10
     
     func requestLocation(completion: @escaping (CLLocation?) -> ()) {
         if location != nil {
@@ -53,10 +54,10 @@ class BusinessSearchViewModel {
     
     private func search(withTerm term: String, location: CLLocation, completion: @escaping FusionSearchResultsCompletion) {
         DispatchQueue.global().async { [weak self] in
-            guard let offset = self?.offset else { return }
+            guard let offset = self?.offset, let limit = self?.limit else { return }
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
-            let searchResource = BusinessSearchResult.query(term: term, limit: offset, offset: offset, atLocation: location)!
+            let searchResource = BusinessSearchResult.query(term: term, limit: limit, offset: offset, atLocation: location)!
             self?.client.get(resource: searchResource, completion: { (searchResult, error) in
                 dispatchGroup.notify(queue: DispatchQueue.main) {
                     completion(self?.buisinessSearchResults, error)
@@ -66,7 +67,7 @@ class BusinessSearchViewModel {
                     self?.buisinessSearchResults = searchResult
                     if error == nil {
                         self?.businesses += searchResult.businesses
-                        self?.offset += 20
+                        self?.offset += limit
                     }
                 }
                 //                for (i, _) in searchResult.businesses.enumerated() {
